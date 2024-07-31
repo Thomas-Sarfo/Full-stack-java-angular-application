@@ -1,0 +1,120 @@
+<div class="container" style="margin-top:80px">
+  <div class="alert alert-success" *ngIf="deletedSuccessfully">
+    <p>You have successfully completed list: {{deletedId}}. {{descriptionOfCompletedList}}</p>
+  </div>
+  <ng-container *ngIf="!loading">
+
+    <table class="table table-striped">
+
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Descirption</th>
+          <th>Target Date:</th>
+          <th>Is Past Due?</th>
+          <th>Action</th>
+          <th>Update</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let list of toDos">
+          <td>{{list.id}}</td>
+          <td>{{list.description}}</td>
+          <td>{{list.setDate | date:'yyyy-MM-dd'}}</td>
+          <td>{{list.isDone?"yes":"no"}}</td>
+          <td><button id="{{list.id}}" class="btn btn-warning" value="{{list.description}}"
+              (click)="deleteThisById($event)">delete</button></td>
+          <td><button id="{{list.id}}" class="btn btn-info" value="{{list.description}}"
+              (click)="getSingleTodoDetails($event)" data-toggle="modal" data-target="#exampleModal">update</button>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+  </ng-container>
+
+  <ng-container *ngIf="loading">
+    <div class="container">
+      <div class="alert alert-warning">
+        Loading data or data is unavailable...
+      </div>
+    </div>
+
+  </ng-container>
+
+
+  <br>
+
+  <button class="btn btn-info" (click)="goBackToWelcomePage()" style="margin-right: 20px"> ⬅️ Back </button>
+  <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" (click)="popModalOpen()"> ➕ Add to
+    lists</button>
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Lets jot it here...</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- savenew list -->
+        <div class="modal-body" *ngIf="!showUpdateBtn">
+          <form #saveNewListForm="ngForm" (ngSubmit)="!saveNewListForm.invalid && saveNewList($event)"
+            [formGroup]="form">
+            <!-- description -->
+            <div class="form-group">
+              <label for="description">Describe it:</label>
+              <input name="description" type="text" class="form-control" id="description" formControlName="description"
+                placeholder="Describe the activity" required>
+              <p *ngIf="form.get('description').hasError('required') && saveNewListForm.submitted">Name is required</p>
+            </div>
+            <!-- date -->
+            <div class="form-group">
+              <label for="date">Target Date:</label>
+              <input name="date" type="date" class="form-control" id="date" placeholder="Complete it on what date?"
+                formControlName="date" required>
+              <p *ngIf="form.get('date').hasError('required') && saveNewListForm.submitted">Date is required
+              </p>
+            </div>
+            <small *ngIf="form.hasError('required', 'formCtrlName') && saveNewListForm.submitted">
+              Required!
+            </small>
+            <button type="submit" class="btn btn-primary" [disabled]="disableSubmitBtn">Submit</button>
+          </form>
+        </div>
+
+
+        <!-- update list -->
+        <div class="modal-body" *ngIf="showUpdateBtn">
+          <form #updateListForm="ngForm" (ngSubmit)="!updateListForm.invalid && updateAnItem($event)">
+            <div class="form-group">
+              <label for="description">Update the description:</label>
+              <input name="description" type="text" class="form-control" id="description"
+                placeholder="Describe the activity" [(ngModel)]="updateDescription">
+            </div>
+            <div class="form-group">
+              <label for="date">Update the target date:</label>
+              <input name="date" type="date" class="form-control" id="date" placeholder="Complete it on what date?"
+                [ngModel]="updateDate" (ngModelChange)="date=$event">
+              {{updateDate}}
+            </div>
+
+            <!-- <button type="submit" class="btn btn-primary" [disabled]="disableSubmitBtn">Submit</button> -->
+
+            <div class=" modal-footer">
+              <!-- <button *ngIf="!disableSubmitBtn" type="button" class="btn btn-secondary">Close</button> -->
+              <button type="submit" class="btn btn-primary">update changes</button>
+            </div>
+          </form>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
